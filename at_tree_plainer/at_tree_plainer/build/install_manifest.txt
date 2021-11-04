@@ -1,0 +1,8 @@
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/lib/libATP.dylib
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/include/ATreePlainer.hpp
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/lib/libATP_rdict.pcm
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/bin/main
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/lib/cmake/ATP/ATPTargets.cmake
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/lib/cmake/ATP/ATPTargets-relwithdebinfo.cmake
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/lib/cmake/ATP/ATPConfig.cmake
+/Users/julnow/gsi/inz/at_tree_plainer/at_tree_plainer/install/lib/cmake/ATP/ATPConfigVersion.cmake
