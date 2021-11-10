@@ -39,14 +39,16 @@ protected:
   //**** input fields ***********
   int l_id_tof_{AnalysisTree::UndefValueInt};
   int t_id_tof_{AnalysisTree::UndefValueInt};
+  int mass2_id_tof_{AnalysisTree::UndefValueInt};
   int m_id_sim_{AnalysisTree::UndefValueInt};
-  
+
   int q_id_vtx_{AnalysisTree::UndefValueInt};
 
   //*****************************
 
   //***** output fields *********
   int l_id_w1_{AnalysisTree::UndefValueInt};
+  int mass2_id_w1_{AnalysisTree::UndefValueInt};
   int t_id_w1_{AnalysisTree::UndefValueInt};
   int q_id_w1_{AnalysisTree::UndefValueInt};
 
