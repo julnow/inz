@@ -37,8 +37,8 @@ protected:
   // static constexpr float lambda_mass_sigma = 1.5e-3;
 
   //**** input fields ***********
-  int l_id_tof_{AnalysisTree::UndefValueInt};
-  int t_id_tof_{AnalysisTree::UndefValueInt};
+  // int l_id_tof_{AnalysisTree::UndefValueInt};
+  // int t_id_tof_{AnalysisTree::UndefValueInt};
   int mass2_id_tof_{AnalysisTree::UndefValueInt};
   int m_id_sim_{AnalysisTree::UndefValueInt};
 
@@ -47,9 +47,9 @@ protected:
   //*****************************
 
   //***** output fields *********
-  int l_id_w1_{AnalysisTree::UndefValueInt};
+  // int l_id_w1_{AnalysisTree::UndefValueInt};
   int mass2_id_w1_{AnalysisTree::UndefValueInt};
-  int t_id_w1_{AnalysisTree::UndefValueInt};
+  // int t_id_w1_{AnalysisTree::UndefValueInt};
   int q_id_w1_{AnalysisTree::UndefValueInt};
 
 
