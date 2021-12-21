@@ -41,7 +41,7 @@ void ATreePlainer::Exec()
 
        const auto matched_particle_sim_id = tof2sim_match_->GetMatch(input_particle.GetId());
        if (matched_particle_sim_id > 0){
-         const auto matched_particle_vtx_id = vtx2tof_match_->GetMatch(input_particle.GetId());
+         const auto matched_particle_vtx_id = vtx2tof_match_->GetMatchInverted(input_particle.GetId());
          if (matched_particle_vtx_id > 0){
            //from tof
             auto& output_particle = plain_branch_->AddChannel(out_config->GetBranchConfig(plain_branch_->GetId()));
