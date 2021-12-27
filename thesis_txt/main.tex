@@ -1,0 +1,179 @@
+%
+%	Szablon pracy dyplowowej inżynierskiej
+%	rok akademicki 2020/21
+%	Autor: Małgorzta Karabowicz
+%	na podstawie szablonu stworzonego przez Przemysława Michalskiego (Wydział Fizyki PW)
+%
+%	brak gwarancji na 100% zgodność z najnowzym wzorem pracy inż. udostępnionym przez dziekanat
+%
+
+
+\documentclass[12pt,a4paper,twoside]{book}
+\linespread{1.3} %interlinia
+
+\usepackage{english}
+
+%czcionki
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+ 
+\usepackage[scaled=0.92]{helvet} % użyta czcionka Helvetica
+\renewcommand\familydefault{\sfdefault} %czcionka bezszeryfowa
+\fontshape{n}
+\selectfont
+
+%definicje kolorów
+\usepackage[table]{xcolor}
+\definecolor{sliwka}{RGB}{150,95,119} %kolor liwkowy, zgodny z zaleceniami
+\definecolor{grafit}{RGB}{60,60,60} %kolor grafitowy, zgodny z zaleceniami (przy druku monochromatycznym)
+
+%linki w PDFie - linkowane są przypisy oraz bibliografia
+\usepackage{hyperref}
+\hypersetup{
+	pdftitle = {}, %tytuł dokumentu PDF
+	pdfauthor = {}, %autor PDFa
+	colorlinks,
+	linktoc=page,
+	linkcolor=sliwka,
+	citecolor=sliwka,
+	filecolor=sliwka,
+	urlcolor=sliwka
+}
+
+\usepackage{amsmath,amsfonts,amssymb} %fonty matematyczne
+\usepackage{icomma} %brak spacji po przecinku w trybie matematycznym (zwykle przecinek jest traktowany jako rozdział między kolejnymi trzema cyframi)
+\usepackage{textcomp} %the package supports the Text Companion fonts, which provide many text symbols
+\usepackage{gensymb} %stopien Celsjusza (\celcius), stopien (\degree), mikro (\micro), om (\textohm) i promil (\perthousand) w trybie tekstowym
+
+\usepackage{graphicx}
+\usepackage{placeins} %defines a \FloatBarrier, beyond which floats cannot pass. Przydatne, gdy obrazki/tabele nie wstawiają się tam, gdzie chcemy.
+
+%marginesy
+\usepackage[left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry} 
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt} %brak linii w nagłówku
+\renewcommand{\footrulewidth}{1.5pt} %linia w stopce
+\renewcommand{\footrule}{{\color{sliwka}%
+	\vskip-\footruleskip\vskip-\footrulewidth
+	\hrule width\headwidth height\footrulewidth\vskip\footruleskip}} %kolor linii w stopce
+
+\fancyhead{} %pusty nagłówek
+\cfoot{} %pusta środkowa część stopki
+\fancyfoot[LE,RO]{\thepage} %numer strony w stopce na parzystej stronie z lewej, na nieparzystej - z prawej
+
+%listy - kształt punktów
+\renewcommand\labelitemi{\color{sliwka}{\tiny$\blacksquare$}} %1. poziom
+\renewcommand\labelitemii{\color{sliwka}{\tiny$\square$}} %2. poziom
+\renewcommand\labelitemiii{\color{sliwka}{$\cdot$}} %3. poziom
+%wcięcia w listach
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep, topsep=0pt, leftmargin=1cm, itemindent=0cm}
+
+%stylistyka
+\widowpenalty=10000 %nie pozostawia wdów na końcu strony
+\clubpenalty=10000 %nie pozostawia sierot
+\brokenpenalty 10000 %nie dzieli stron, gdy przenoszony jest wyraz
+\sloppy % zakaz wydłużania linii poza margines
+\usepackage[none]{hyphenat} %bez przenoszenia wyrazów
+\frenchspacing %,,kontynentalne" zwyczaje typograficzne
+
+%odstêpy
+\usepackage{setspace}
+\setstretch{1.15} %odstęp między wierszami
+\setlength{\parindent}{4pt} %szerokość wciecia akapitowego
+\setlength{\parskip}{0pt} % odstęp za akapitem
+
+%obrazki/tabele/równania
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{multirow}
+\setlength{\arrayrulewidth}{1pt} %grubość linii tabeli
+\arrayrulecolor{sliwka} %kolor linii tabeli
+\renewcommand\thefootnote{\textcolor{sliwka}{\arabic{footnote}}} %kolor numeru przypisu
+\usepackage[font={footnotesize}]{caption} %czcionka 9 pkt w podpisach tabeli/obrazków
+\numberwithin{equation}{chapter} %numerowanie równań od numeru rozdziału
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+\usepackage[italic]{hepnames} %%hep names
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\floatstyle{plaintop}
+\restylefloat{table} %table caption above table
+
+
+
+
+\let\lll=\relax
+
+
+\graphicspath{ {./img/} {./rysunki/} {./wykresy/} }
+
+
+% ustawienia tytułów rozdziałów
+\usepackage{titlesec}
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+\titlespacing{\section}{0pt}{15pt}{10pt}
+\titlespacing{\subsection}{0pt}{15pt}{10pt}
+
+
+
+\begin{document}
+
+\input{./chapters/strony_wstepne}
+
+%spis treci
+\tableofcontents
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\pagestyle{empty}
+
+\chapter{Introduction}
+\thispagestyle{fancy}
+\input{./chapters/01_introduction}
+%\pagestyle{fancy} % można włączyć jak chcemy, aby puste strony również miały numer i linię w dolnej stopce
+
+\chapter{Physical motivation}
+\thispagestyle{fancy}
+\input{./chapters/02_motivation}
+\chapter{FAIR and CBM}
+\input{./chapters/03_cbm}
+\chapter{Machine learning}
+\input{./chapters/04_ml}
+\chapter{Traditional methods of particles identification}
+\input{./chapters/05_traditional}
+\chapter{Optimizing \PKshort reconstruction using ML}
+\input{./chapters/06_kshort}
+\chapter{''TOF'' particles identification using ML}
+\input{./chapters/07_tof}
+\chapter{Discussion and summary}
+\input{./chapters/08_summary}
+\input{./chapters/bibliografia}
+
+
+\listoffigures
+\thispagestyle{fancy}
+
+\listoftables
+\thispagestyle{fancy}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

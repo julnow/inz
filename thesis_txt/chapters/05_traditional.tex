@@ -1,0 +1,89 @@
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%% TOF
+\section{Particle identification using the time-of-flight method}\thispagestyle{fancy}
+
+The time-of-flight method (TOF) allows us to differentiate between the groups of particles such as pions, kaons, and protons (positrons). Using the reconstructed:
+\begin{itemize}
+    \item from the STS and MVD detectors: momentum ($p$) and charge ($q$) 
+    \item from the TOF detector: time of flight ($t$) and length of the track in the detector ($L$)
+\end{itemize} the mass-squared of a reconstructed particle can be calculated following the formula:
+\begin{equation}
+    m^2 = \frac{p^2}{c^2} \cdot \frac{c^2t^2}{L^2-1}
+    \label{msquared}
+\end{equation}
+where  $c$ - velocity of light. Making a 2D plot, showing $m^2$ on the \emph{y}-axis, and $p\cdot q$ on the \emph{x}-axis, we receive a plot such as on the Figure \ref{tof plot}. To further differentiate between the groups of the particles, Gaussian functions can be fitted to the distributions. However, the last step is a non-trivial task, causing the majority of the inaccuracy. While several solutions to this problem exist, such as multidimensional fitting (using more reconstructed variables), the application of ML algorithms will be discussed in this work. 
+
+Other groups of particles such as e.g., muons and electrons, can also be reconstructed using the data from other detectors (respectively MUCH and RICH), but it goes beyond the scope of this thesis.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.9\textwidth]{inz_szablon_new/img/tof_plot.png}
+    \caption{2D TOF plot with pions, kaons, protons and deuterons shown \cite{ostrowski}}
+    \label{tof plot}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%% KFPF
+\section{Short-lived particles reconstruction}
+
+Short-lived particles like $\Lambda^0$, and \PKshort have neutral charge, therefore they cannot be detected directly using e.g., the TOF method. However, we can reconstruct these particles by investigating their \emph{daughter particles}, particles coming from their decays. For example, in the main decay mode (66.7\%) a K-short particle decays into a positive and negative pion (Figure \ref{ks decay}). Using i.e. the STS, we can reconstruct the tracks of pions coming from this decay, and thus reconstruct the K-short particle
+
+\begin{figure}[H]
+\centering
+    \includegraphics[width=.4\textwidth]{img/kdecay1.png}
+    \caption{\PKshort main decay mode \cite{kdecay1}}
+    \label{ks decay}
+\end{figure}
+
+In order to do so, the \emph{KFParticleFinder} was developed \cite{kfp}. It is an on-line optimized reconstruction package based on Kalman Filter mathematics. It finds pairs of positive and negative pions (in the \PKShort case) which could be a result of the particle's decay.
+%------------------------- PFSimple
+\subsection{PFSimple}
+For offline selection optimization and analysis, PFSimple package was created \cite{lubynets}. Using it, one can optimize selection criteria to differentiate between:
+\begin{itemize}
+    \item signal - pion pairs created in K-short decay
+    \item background - pions pairs returned by KFParticleFinder which are not the result of K-short decay
+\end{itemize}
+Also, PFSimple returns these attributes of each reconstructed particle:
+\begin{itemize}
+    \item L/$\Delta$L - distance between primary and secondary vertex divided over its error
+    \item DCA - distance of closest approach between pion tracks
+    \item $\chi^2$ geo - dimensionless distance of closest approach between pion tracks
+    \item $\chi^2$ topo - dimensionless distance of closest approach between extrapolated kaon trajectory and primary vertex
+    \item $\chi^2$ prim - dimensionless distance between extrapolated secondary track and primary vertex
+    \item $\cos(\alpha)$ - cosine of angle between pion and K-short momenta
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.9\textwidth]{img/pfsimple_variables.png}
+    \caption{Decay scheme and topological variables of a \PKshort decay in the PFSimple}
+    \label{cbm_setup}
+\end{figure}
+%------------------------- optimization of selection criteria
+\subsubsection{Optimization of selection criteria}
+As the KFParticle Finder (and PFSimple) return all the possible pion pairs, which could be a result of K-short decay,  some selection criteria need to be applied to differentiate between the signal and background.\\
+
+We can also visualize manual selection criteria with a decision tree:
+\begin{itemize}
+    \item For each variable of a reconstructed particle, a conditional statement is being set
+    \item If all conditions are fulfilled, a K-short candidate is treated as a signal  candidate
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.6\textwidth]{img/decision_tree.png}
+    \caption{Example of a decision tree using manual selection criteria}
+\end{figure}
+
+Manual procedure for selection criteria optimization \cite{lubynets} is as follows:
+\begin{enumerate}
+    \item The goal is to suppress as a lot background and to preserve as much signal as possible 
+    \item Plot distribution of signal and background for some variable, and select a point above which all entries are considered as signal or background
+    \item Repeat it for all the variables
+\end{enumerate}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/pfsimple_distributions.pdf}
+     \caption{Example of distributions to be checked with the manual selection criteria optimization}
+\end{figure}
+
+However, this task is non-automatized (must be repeated for each particle), collision simulating model dependent, and only linear (as one variable at a time is used). In this work, the application of ML algorithm for the optimization of selection criteria will be discussed.
