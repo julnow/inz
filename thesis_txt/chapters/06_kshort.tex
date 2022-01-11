@@ -2,7 +2,7 @@
 %%%%%%%%%%%%%%%%% KOS reconstruction
 
 
-In this chapter, the application of the ML algorithms for optimizing \PKshort reconstruction (and thus proper identification) will be discussed. As opposed to the traditional method mentioned in the chapter before, the predicted advantages and disadvantages are presented in the table below:
+In this chapter, the application of the ML algorithms for optimizing \PKshort reconstruction (and thus proper identification) will be discussed. As opposed to the traditional method mentioned in the chapter before, the predicted advantages and disadvantages are presented in Table \ref{tab:mlselection}.
 \begin{table}[H]
     \begin{tabular}{|l|l}
     \hline
@@ -13,19 +13,20 @@ In this chapter, the application of the ML algorithms for optimizing \PKshort re
     \begin{tabular}[c]{@{}l@{}}With \emph{probability} a  value from which we consider \\a particle as a K-short particle can be chosen;\\ it can aim for better reconstruction efficiency \\ or a better background reduction\end{tabular} &
        \\ \cline{1-1}
     \end{tabular}
+    
 \caption{\label{tab:mlselection}Advantages and disadvantages of ML selection criteria optimization}
 \end{table}
-\\The accuracy of these predictions will be checked in this chapter. The results of the K-short reconstruction optimization and has been presented before in \cite{get involved} (some fragments of this report will be presented in the following sections).
+\\The accuracy of these predictions will be checked in this chapter. The results of the K-short reconstruction optimization and have been presented before in \cite{get involved} (some fragments of this report will be presented in the following sections).
 
 \section{Model preparation}\thispagestyle{fancy}
-All the data is stored in the AnalysisTree format, later passed through the PFSimple (C++ with ROOT framework),  which returns all the possible K-short's daughter particles pairs, from which we could reconstruct a K-short particle. All the possible pairs along with the variables (described in the chapter before) are available for training in the \emph{PlainTree} format, which can be loaded into Pandas Dataframe (Python), using a function prepared by the CBM-ML group\cite{plaintree}. Version 3.7 of Python was used, with the following libraries:
+All the data is stored in the AnalysisTree format, later passed through the PFSimple (C++ with ROOT framework),  which returns all the possible K-short's daughter particles pairs, from which we could reconstruct a K-short particle. All the possible pairs along with the variables (described in the chapter before) are available for training in the \emph{PlainTree} format, which can be loaded into Pandas Dataframe (Python), using a function prepared by the CBM-ML group \cite{plaintree}. Version 3.7 of Python was used, with the following libraries:
 \begin{itemize}
     \item pandas (version 1.3.4)
     \item xgboost (version 1.3.3)
     \item scikit-learn (version 1.0.1)
     \item bayesian-optimization (version 1.1.0)
 \end{itemize}
-The parts of the code used for the ML model training are shown in the appendix A.
+The parts of the code used for the ML model training are shown in Appendix A.
 
 \subsection{Data enriching}
 There are two problems to tackle before providing datasets to our ML model: underrepresentation and dependence of collision simulation model.
@@ -37,11 +38,12 @@ To make the ML model partially independent of the collision simulation model,  s
     \item primary Ks candidates only in 5$\sigma$ region: $0.43485 - 0.56135$ (GeV/$c^2$) from DCM-QGSM-SMM model, (simulation data)
     \item background outside 5$\sigma$ region from UrQMD model, which mimics experimental data (will be replaced by real experimental data while CBM experiment starts)
 \end{itemize}
-Also, the UrQMD model is being used as a test dataset (as the model does not "know" the signal candidates from this MC model).
+ The selection process is shown on Figure \ref{enriching}. Also, the UrQMD model is being used as a test dataset (as the model does not "know" the signal candidates from this MC model).
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{img/dataset.png}
+    \includegraphics[width=.8\textwidth]{img/dataset.png}
     \caption{Data enriching}
+    \label{enriching}
 \end{figure}
 In total, the following datasets will be used:
 \begin{itemize}
@@ -61,7 +63,7 @@ As in the simulated data, less than 0.1\% of K-short candidates are signal candi
 
 %------------- data cleaning
 \subsection{Data cleaning}
-To reject the numeric values of parameters which do not have physical sense, but are present in the data set, some selection criteria are applied before the beginning of the model training. Similarly, we some values which might be possible but are rare enough are rejected, to reduce the amount of data.
+To reject the numeric values of parameters that do not have physical sense, but are present in the data set, some selection criteria are applied before the beginning of the model training. Similarly, some values which might be possible but are rare enough are rejected, to reduce the amount of data.
 
 %----------------------- Invariant mass
 \subsubsection{Invariant mass}
@@ -133,19 +135,23 @@ To reduce the data, following the maximal values are selected:
 
 %----------------------- pseudorapidity
 \subsubsection{Pseudorapidity}
-As pseudorapidity depends on polar angle as $\eta = -\ln{\tan(\frac{\theta}{2})}$, and the STS covers the polar angles between 2.5$^{\circ}$ and 25$^{\circ}$, for which the pseudorapidity values would equal:
+As pseudorapidity depends on the polar angle as 
+\begin{equation}
+    \eta = -\ln{\tan(\frac{\theta}{2})}
+\end{equation}
+where $\theta$ - polar angle, and the STS covers the polar angles between 2.5$^{\circ}$ and 25$^{\circ}$, for which the pseudorapidity values would equal:
 \begin{center}
     $ 1.5< \eta < 3.82 $
 \end{center}
-However, due to the magnetic field, the pseudorapidity is constrained to following values:
+However, due to the magnetic field, the pseudorapidity is constrained to the following values:
 \begin{center}
     $ 1.0< \eta < 6.5 $
 \end{center}
-with which we loose 0.06\% of data for signal (instead of 5.66\%) and 0.08\% of data for background (instead of 6.75\%)
+with which 0.06\% of data for signal is lost (instead of 5.66\%) and 0.08\% of data for background (instead of 6.75\%)
 
 %------------------ variables selection
 \subsection{Variables selection}
-The last step before training our model is the selection of variables which will be used in the training of the discriminator. To make the model simpler, there is no need to use two variables if they are strongly correlated with each other. Also, to avoid signal/background classification directly by invariant mass, variables strongly correlated with the invariant mass of background should be omitted.
+The last step before training our model is the selection of variables that will be used in the training of the discriminator. To make the model simpler, there is no need to use two variables if they are strongly correlated with each other. Also, to avoid signal/background classification directly by invariant mass, variables strongly correlated with the invariant mass of background should be omitted.
 \subsubsection{Correlation matrix}
 The Pearson correlation efficient of each variable is being calculated following this formula:
 \begin{equation}
@@ -159,20 +165,22 @@ where:
     \sigma_X = \sqrt{\operatorname{E}\left[\left(X - \operatorname{E}\left[X\right]\right)^2\right]}
     \label{stddev}
 \end{equation}
-They are then plotted in a matrix:
+They are then plotted in a matrix shown on Figure \ref{correlation matrix}.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1.1\textwidth]{img/Correlations_of_all_variables_for_both_background_and_signal_after_quality_cuts_(pearson).pdf}
     \caption{Correlation matrix}
+    \label{correlation matrix}
 \end{figure}
 \clearpage
 %-------------------- Correlation with invariant mass
 \subsubsection{Correlation with invariant mass}
-Later, the correlation (Pearson coefficient) of each variable with the invariant mass of (separately) signal and background is being checked 
+Later, the correlation (Pearson coefficient) of each variable with the invariant mass of (separately) signal and background is being checked (plotted on Figure \ref{all variables}).
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{img/Correlation_of_all_variables_with_mass_along_with_SEM.pdf}
     \caption{Correlation of all variables with mass}
+    \label{all variables}
 \end{figure}
 
 %-------------------- Selected variables
@@ -183,10 +191,10 @@ Based on that, the following 6 variables are selected for the training: $L/\Delt
 \section{Model training}
 %--------- results for 12A GeV/c
 \subsection{Results for $p_{\text{beam}}$ = 12A GeV/c}
-Having prepared the data, the training of the ML algorithm may be initiated. To choose the hyper-parameters of the XGBoost model, the Bayesian Optimisation package was used.\\
+Having prepared the data, the training of the ML algorithm may be initiated. To choose the hyper-parameters values of the XGBoost model, the Bayesian Optimisation package was used.\\
 %--------------- Cross validation
-\subsubsection{Cross validation}
-To check if the model works as well on new data, as on the training dataset,  Receiver Operating Characteristic and probability plot are prepared.
+\subsubsection{Cross-validation}
+To check if the model works as well on new data, as on the training dataset,  Receiver Operating Characteristic (Figure \ref{ROC}) and probability plots (Figure \ref{Probability plot}) are drawn.
 
 Receiver Operating Characteristic illustrates the diagnostic ability of a binary classifier. Threshold on the ROC (Receiver Operating Characteristic) curve which maximizes Approximate Median Significance 
 \begin{equation}
@@ -195,24 +203,25 @@ Receiver Operating Characteristic illustrates the diagnostic ability of a binary
 (where $t(f)pr$ is true (false) positive rate) on the test sample is the best threshold.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{img/ams.pdf}
+    \includegraphics[width=.98\textwidth]{img/ams.pdf}
     \caption{Receiver Operating Characteristic}
+    \label{ROC}
 \end{figure}
 We see that the optimal point on ROC is similar for both train and test datasets.
-The graph of signal/background share in both train and test datasets is also plotted.
+Based on signal/background share in both train and test datasets from the probability plot (Figure \ref{Probability plot}), it is observed that the results are similar for the two datasets. Hence, we can say that our model is not overtrained (works well on new data).
 \begin{figure}[H]
     \centering
     \includegraphics[width=.8\textwidth]{img/probability.pdf}
     \caption{Probability plot}
+    \label{Probability plot}
 \end{figure}
 
-Once again, the results are similar for the two datasets. Hence, we can say that our model is not overtrained (works well on new data).
-
-The invariant mass distribution before and after XGB selection is presented before:
+The invariant mass distribution before and after XGB selection is presented on Figure \ref{Invariant mass distribution}:
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=.9\textwidth]{img/cut_visualization.png}
+    \includegraphics[width=.88\textwidth]{img/cut_visualization.png}
     \caption{Invariant mass distribution}
+    \label{Invariant mass distribution}
 \end{figure}
 
 
