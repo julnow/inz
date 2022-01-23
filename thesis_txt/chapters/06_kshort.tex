@@ -1,8 +1,7 @@
 \pagestyle{fancy}
 %%%%%%%%%%%%%%%%% KOS reconstruction
 
-
-In this chapter, the application of the ML algorithms for optimizing \PKshort reconstruction (and thus proper identification) will be discussed. As opposed to the traditional method mentioned in the chapter before, the predicted advantages and disadvantages are presented in Table \ref{tab:mlselection}.
+In this chapter, the application of the ML algorithms for the optimization of selection criteria for \PKshort reconstruction (and thus proper identification) will be discussed. As opposed to the traditional method of optimization of selection criteria, mentioned in the chapter before, the predicted advantages and disadvantages are presented in Table \ref{tab:mlselection}.
 \begin{table}[H]
     \begin{tabular}{|l|l}
     \hline
@@ -16,17 +15,17 @@ In this chapter, the application of the ML algorithms for optimizing \PKshort re
     
 \caption{\label{tab:mlselection}Advantages and disadvantages of ML selection criteria optimization}
 \end{table}
-\\The accuracy of these predictions will be checked in this chapter. The results of the K-short reconstruction optimization and have been presented before in \cite{get involved} (some fragments of this report will be presented in the following sections).
+\\The accuracy of these predictions will be checked in this chapter. The results of the K-short reconstruction optimization have been presented before in \cite{get involved} (some fragments of this report will be presented in the following sections).
 
 \section{Model preparation}\thispagestyle{fancy}
-All the data is stored in the AnalysisTree format, later passed through the PFSimple (C++ with ROOT framework),  which returns all the possible K-short's daughter particles pairs, from which we could reconstruct a K-short particle. All the possible pairs along with the variables (described in the chapter before) are available for training in the \emph{PlainTree} format, which can be loaded into Pandas Dataframe (Python), using a function prepared by the CBM-ML group \cite{plaintree}. Version 3.7 of Python was used, with the following libraries:
+The CBM collaboration stores its analysis data in a storage efficient format called an AnalysisTree. For this analysis, it is later passed through the PFSimple (C++ with ROOT framework),  which combines positive and negative pions tracks (possible K-short's daughter particles pairs) and returns variables associated with these tracks, from which we could reconstruct a K-short particle. All the possible pairs along with the variables (described in the chapter before) are available for training in the \emph{PlainTree} format, which can be loaded into Pandas Dataframe (Python), using a function prepared by the CBM-ML group \cite{plaintree}\cite{uproot}. Version 3.7 of Python was used, with the following libraries:
 \begin{itemize}
     \item pandas (version 1.3.4)
     \item xgboost (version 1.3.3)
     \item scikit-learn (version 1.0.1)
     \item bayesian-optimization (version 1.1.0)
 \end{itemize}
-The parts of the code used for the ML model training are shown in Appendix A.
+A part of the code used for the ML model training is shown in Appendix A.
 
 \subsection{Data enriching}
 There are two problems to tackle before providing datasets to our ML model: underrepresentation and dependence of collision simulation model.
@@ -55,7 +54,7 @@ Au-Au @12A(3.3A) GeV/c passed through CBM setup in GEANT4, and PFSimple.
 
 %---------------underrepresentation
 \subsubsection{Underrepresentation}
-As in the simulated data, less than 0.1\% of K-short candidates are signal candidates, the ratio in the training dataset has to be changed so that the model learns how to identify signal candidates well. The number of background entries is rescaled by this formula:
+As in the simulated data, less than 0.1\% of K-short candidates are signal candidates, the ratio in the training dataset has to be changed so that the model learns how to identify signal candidates well. Using the trail and error method, it is decided that the number of background entries is rescaled by this formula:
 \begin{equation}
     n_\text{events(background)} = 5 \cdot n_\text{events(signal)}
 \end{equation}
@@ -63,7 +62,7 @@ As in the simulated data, less than 0.1\% of K-short candidates are signal candi
 
 %------------- data cleaning
 \subsection{Data cleaning}
-To reject the numeric values of parameters that do not have physical sense, but are present in the data set, some selection criteria are applied before the beginning of the model training. Similarly, some values which might be possible but are rare enough are rejected, to reduce the amount of data.
+To reject the numeric values of parameters that do not have physical sense, but are present in the data set, some selection criteria are applied before the beginning of the model training. Similarly, some values which might be possible but their uncertainties are big are rejected, to reduce the amount of data.
 
 %----------------------- Invariant mass
 \subsubsection{Invariant mass}
@@ -78,7 +77,7 @@ Also, to reduce the amount of data:
 
 %---------------- distances
 \subsubsection{Distances and \emph{x, y, z} coordinates}
-Distance between the primary vertex (the point where the collision of the nuclei happens), and the secondary vertex (the extrapolated point where the two daughter particles should have crossed each other)  - $l$ and the distance of closest approach between the two pions - $DCA$ - should not be smaller than zero:
+Distance between the primary vertex (the point where the collision of the nuclei happens), and the secondary vertex (the extrapolated point where the two daughter particles should have crossed each other)  - $l$ and the distance of closest approach between the two pions - $DCA$ -  cannot be smaller than zero:
 \begin{center}
     $DCA$, $l$, $\frac{l}{\Delta l}$ $> 0$
 \end{center}
@@ -135,7 +134,7 @@ To reduce the data, following the maximal values are selected:
 
 %----------------------- pseudorapidity
 \subsubsection{Pseudorapidity}
-As pseudorapidity depends on the polar angle as 
+Pseudorapidity in terms of the polar angle can be defined as:
 \begin{equation}
     \eta = -\ln{\tan(\frac{\theta}{2})}
 \end{equation}
@@ -151,11 +150,12 @@ with which 0.06\% of data for signal is lost (instead of 5.66\%) and 0.08\% of d
 
 %------------------ variables selection
 \subsection{Variables selection}
-The last step before training our model is the selection of variables that will be used in the training of the discriminator. To make the model simpler, there is no need to use two variables if they are strongly correlated with each other. Also, to avoid signal/background classification directly by invariant mass, variables strongly correlated with the invariant mass of background should be omitted.
+The last step before training our model is the selection of variables that will be used in the training of the discriminator. To make the model simpler, there is no need to use multiple variables if they are strongly correlated with each other. Also, to avoid signal/background classification directly by invariant mass, variables strongly correlated with the invariant mass of background should be omitted.
 \subsubsection{Correlation matrix}
-The Pearson correlation efficient of each variable is being calculated following this formula:
+The Pearson correlation coefficient (which shows linear correlation) of each variable is being calculated following this formula:
 \begin{equation}
     \rho = \frac{\operatorname{COV}(X, Y)}{\sigma_X \times \sigma_Y}
+    \label{pearson}
 \end{equation}
 where:
 \begin{equation}
@@ -165,7 +165,7 @@ where:
     \sigma_X = \sqrt{\operatorname{E}\left[\left(X - \operatorname{E}\left[X\right]\right)^2\right]}
     \label{stddev}
 \end{equation}
-They are then plotted in a matrix shown on Figure \ref{correlation matrix}.
+They are then plotted in a matrix shown on Figure \ref{correlation matrix} (where chi2... means $\chi^2$..., distance - $DCA$, loverdl - $\frac{l}{\Delta l}$). For example  e, it shows that there is no need to use  \emph{rapidity}, $p$, $p_T$ and $p_z$ for training, as those four variables are highly correlated ($\rho > 0.5$). 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1.1\textwidth]{img/Correlations_of_all_variables_for_both_background_and_signal_after_quality_cuts_(pearson).pdf}
@@ -175,7 +175,7 @@ They are then plotted in a matrix shown on Figure \ref{correlation matrix}.
 \clearpage
 %-------------------- Correlation with invariant mass
 \subsubsection{Correlation with invariant mass}
-Later, the correlation (Pearson coefficient) of each variable with the invariant mass of (separately) signal and background is being checked (plotted on Figure \ref{all variables}).
+The correlation (Pearson coefficient) of each variable with the invariant mass of (separately) signal and background is being checked (plotted on Figure \ref{all variables}).
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{img/Correlation_of_all_variables_with_mass_along_with_SEM.pdf}
@@ -189,12 +189,13 @@ Based on that, the following 6 variables are selected for the training: $L/\Delt
 
 %----------------------- Model training
 \section{Model training}
+The model will be trained and tested differently on two collision energies of the CBM experiment: $p_{\text{beam}}$ = 12A GeV/c (described in the first subsection) and $p_{\text{beam}}$ = 3.3A GeV/c (described in the second subsection).
 %--------- results for 12A GeV/c
 \subsection{Results for $p_{\text{beam}}$ = 12A GeV/c}
-Having prepared the data, the training of the ML algorithm may be initiated. To choose the hyper-parameters values of the XGBoost model, the Bayesian Optimisation package was used.\\
+Having prepared the data, the training of the ML algorithm may be initiated. To choose the hyper-parameters values of the XGBoost model, the Bayesian Optimisation package was used.  Along with splitting the train dataset into two equal parts: one for actual training, and the second for validation, the aim is to omit overfitting of the model on the training data. \\
 %--------------- Cross validation
-\subsubsection{Cross-validation}
-To check if the model works as well on new data, as on the training dataset,  Receiver Operating Characteristic (Figure \ref{ROC}) and probability plots (Figure \ref{Probability plot}) are drawn.
+\subsubsection{Validation on test dataset}
+To check if the model works as well on the test data, as on the training dataset,  Receiver Operating Characteristic (Figure \ref{ROC}) and probability plots (Figure \ref{Probability plot}) are drawn.
 
 Receiver Operating Characteristic illustrates the diagnostic ability of a binary classifier. Threshold on the ROC (Receiver Operating Characteristic) curve which maximizes Approximate Median Significance 
 \begin{equation}

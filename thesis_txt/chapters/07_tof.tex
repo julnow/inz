@@ -90,8 +90,7 @@ To reduce the data:
 \end{center}
 %--------------- variables selection
 \subsection{Variables selection}
-In this chapter, the TOF identification method is recreating, so the $m^2$, $p$ and $q$ values are being used. However, the results coming from only those 2 values were not perfect (usually, it is better to train an XGBoost model using multiple variables). After plotting the correlation matrix (Figure \ref{cmatrix tof}), and following the other works \cite{ostrowski}, the $p_T$ and $\eta$ values are being selected also. 
-
+In this chapter, the TOF identification method is recreated, so the $m^2$, $p$ and $q$ values are being used. However, the results coming from only those 2 values were not perfect (usually, it is better to train an XGBoost model using multiple variables). After plotting the correlation matrix (with Pearson correlation efficient \ref{pearson}) (Figure \ref{cmatrix tof}), and following the other works \cite{ostrowski}, the $p_T$ and $\eta$ values are being selected also. The correlation matrix shows that these two variables are not highly correlated ($\rho < 0.4$). 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1.1\textwidth]{inz_szablon_new/img/Correlations_TOF.pdf}
@@ -143,7 +142,7 @@ The following thresholds (which aim for as big efficiency as possible, with corr
 \subsection{Confusion matrix}
 The confusion matrix is useful in checking the accuracy of a classifier. By definition a confusion matrix $C$ is such that $C_{i, j}$ is equal to the number of observations known to be in group $i$ and predicted to be in group $j$. Thus in binary classification, the count of true negatives is $C_{0, 0}$, false negatives is $C_{1, 0}$, true positives is $C_{1, 1}$  and false positives is $C_{0, 1}$\cite{cmatrix}. The normalised confusion matrix shows not the number of observations for each class, but the percentage.
 
-For our model, the confusion matrices after applying the probability threshold are plotted on Figures \ref{cm} and \ref{cm_norm}.
+For our model, the confusion matrices after applying the probability threshold are plotted on Figures \ref{cm} (without normalisation - the number of entries in each category is shown) and \ref{cm_norm} (with normalisation - the percentage shown shows the efficiency of true positives in each category). It is observed, that the efficiency is higher for more represented classes (pions and protons).
 
 Using the information from the confusion matrix, the efficiency of the classifier can be put in the Table \ref{tab:tof}.
 
@@ -196,10 +195,10 @@ After the ML model training and running it on the test dataset, the  invariant m
 
 %----------------------Analysis of the results
 \section{Analysis of the results}
-While the mass-squared distributions are useful, simple visualisation of the classifier results, the TOF plots are handier in analyzing the way the ML model works. The XGBoost-selected particles can be plotted with the simulated particles (all the particles that should be reconstructed) for each class.
+While the mass-squared distributions are useful, simple visualisation of the classifier results, the TOF plots, are handier in analyzing the way the ML model works. The XGBoost-selected particles can be plotted with the simulated particles (all the particles that should be reconstructed) for each class.
 
 \subsubsection{ID = 0 (protons)}
-For particles ID = 0 (protons) we observe, that the protons of mass-squared close to 0 (mostly protons coming directly from the bullet particle) are not identified correctly. However, they should be treated as a different class, as the sigma-selection cuts them out during the training. For the same reason protons with high $p$, but small mass-squared are not identified at all. The 2D TOF plot of both simulated, and XGBoost-selected particles are shown on Figure \ref{2D TOF id0}.
+For particles ID = 0 (protons) it is to observe that the protons of mass-squared close to 0 (mostly protons coming directly from the bullet particle) are not identified correctly. However, they should be treated as a different class, as the sigma-selection cuts them out during the training. For the same reason, protons with high $p$, but small mass-squared are not identified at all. The 2D TOF plot of both simulated, and XGBoost-selected particles, are shown on Figure \ref{2D TOF id0}.
 \begin{figure}[H]
  \centering
     \begin{subfigure}[b]{0.8\linewidth} 
@@ -221,7 +220,7 @@ For particles ID = 0 (protons) we observe, that the protons of mass-squared clos
 \clearpage
 
 \subsubsection{ID = 1 (kaons)}
-For particles ID = 1 (kaons) the efficiency, and the false-positive ratio are the most deviated from the correctness. The ML model with the high value of the threshold chosen picks only kaons with small $p$ value. Also, one region of kaons close to $m^2 = 2$ is also not used in training - however, it may be a result of a mismatch in the simulation, as the kaons are not expected in this region. The 2D TOF plot of both simulated, and XGBoost-selected particles are shown on Figure \ref{2D TOF id1}.
+For particles ID = 1 (kaons) the efficiency, and the false-positive ratio, are  most deviated from correctness. The ML model with a high value of the chosen threshold picks only kaons with small $p$ value. Also, one region of kaons close to $m^2 = 2$ is not used in training - however, it may be a result of a mismatch in the simulation, as the kaons are not expected in this region. The 2D TOF plot of both simulated, and XGBoost-selected particles, are shown on Figure \ref{2D TOF id1}.
 \begin{figure}[H]
  \centering
     \begin{subfigure}[b]{0.8\linewidth} 
@@ -243,7 +242,7 @@ For particles ID = 1 (kaons) the efficiency, and the false-positive ratio are th
 \clearpage
 
 \subsubsection{ID = 2 (pions, muons, and electrons)}
-For particles ID = 2 (pions, muons, and electrons) have the best efficiency, as most of the particles of the lower mass-squared values belong to one of these classes. Once again there is a region that is not expected - electrons of $m^2 \approx 2$, which are most probably a result of the mismatch in the simulation of the CBM setup. The 2D TOF plot of both simulated, and XGBoost-selected particles are shown on Figure \ref{2D TOF id2}.
+For particles ID = 2 (pions, muons, and electrons), the efficiency of the reconstruction is the highest, as most of the particles of the lower mass-squared values belong to one of these classes. Once again, there is a region that is not expected - electrons of $m^2 \approx 2$ which are most probably a result of the mismatch in the simulation of the CBM setup. The 2D TOF plot of both simulated, and XGBoost-selected particles, are shown on Figure \ref{2D TOF id2}.
 \begin{figure}[H]
  \centering
     \begin{subfigure}[b]{0.8\linewidth} 
@@ -265,7 +264,7 @@ For particles ID = 2 (pions, muons, and electrons) have the best efficiency, as 
 \clearpage
 
 \subsubsection{ID = 3 (background)}
-Particles ID = 3 (background) was mostly assigned to the particles of mass-squared close to the value of the mean mass-squared of kaons, but with bigger $p$ values. It can also be seen in the confusion matrix - 0.14\% of kaons are misidentified as background, as well as kaons and ID = 2 particles which, were found in this $m^2$ region. The 2D TOF plot of both simulated, and XGBoost-selected particles are shown on Figure \ref{2D TOF id3}.
+The particles of mass-squared close to the value of the mean mass-squared of kaons, but with bigger $p$ values, were mostly categorized as ID = 3 (background). It can also be seen in the confusion matrix - 0.14\% of kaons are misidentified as background, as well as kaons and ID = 2 particles which were found in this $m^2$ region. The 2D TOF plot of both simulated, and XGBoost-selected particles, are shown on Figure \ref{2D TOF id3}.
 \begin{figure}[H]
  \centering
     \begin{subfigure}[b]{0.8\linewidth} 

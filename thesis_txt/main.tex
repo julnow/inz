@@ -83,7 +83,7 @@
 %odstêpy
 \usepackage{setspace}
 \setstretch{1.15} %odstęp między wierszami
-\setlength{\parindent}{4pt} %szerokość wciecia akapitowego
+\setlength{\parindent}{.5cm} %szerokość wciecia akapitowego
 \setlength{\parskip}{0pt} % odstęp za akapitem
 
 %obrazki/tabele/równania
@@ -120,6 +120,8 @@
   {\normalfont\bfseries}{}{0pt}{\Huge}
 \titlespacing{\section}{0pt}{15pt}{10pt}
 \titlespacing{\subsection}{0pt}{15pt}{10pt}
+% strikethrough \sout{} - przekreslenie
+\usepackage[normalem]{ulem}
 
 
 
@@ -152,20 +154,21 @@
 \input{./chapters/07_tof}
 \chapter{Discussion and summary}
 \input{./chapters/08_summary}
+
+\input{./chapters/bibliografia}
+\listoffigures
+\thispagestyle{fancy}
+
+\listoftables
+\thispagestyle{fancy}
+
 \chapter{Appendix A}
 \input{./chapters/09_A}
 \chapter{Appendix B}
 \input{./chapters/10_B}
 \chapter{Appendix C}
 \input{./chapters/11_C}
-\input{./chapters/bibliografia}
 
-
-\listoffigures
-\thispagestyle{fancy}
-
-\listoftables
-\thispagestyle{fancy}
 
 
 \end{document}

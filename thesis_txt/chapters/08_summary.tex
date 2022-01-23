@@ -1,3 +1,25 @@
 \pagestyle{fancy}
 \thispagestyle{fancy}
-mogło być źle, ale będzie lepiej
+In the first part, the application of machine learning for K-short reconstruction results in better background reduction (Figure \ref{bckgr}) and better efficiency (Figure \ref{effic}), compared to the traditional, manual method. A complicated and extensive search of selection criteria using the manual method can be omitted this way; the same code works for different collision energies and magnetic field scaling settings as well. 
+It allows e.g., the investigation of the influence of the magnetic field scaling on the efficiency of reconstruction (Figure \ref{mf}). 
+The usage of XGBoost allowed for a relatively short training time. 
+Exporting the trained classifier into the CBM experiment simulation and analysis software (CbmRoot) was not part of this thesis. 
+However, the XGBoost model can be easily deployed into ROOT using e.g., Treelite package \cite{treelite}. 
+Also, the classifier should be retrained on more data before applying it into the CbmRoot and tested on real data once the experiment starts.\\
+
+In the second part, the XGBoost model was trained for the identification of three groups of particles, following the traditional TOF method. 
+It allowed receiving efficiencies of identification for protons and pions (along with muons and electrons) around 90\%. 
+However, the least represented class, kaons, achieves an identification efficiency of about 70\% (Table \ref{tab:tof}). Upon comparison of 2D TOF graphs of simulated and identified particles (Figures \ref{2D TOF id0} - \ref{2D TOF id3}), it is observed  that the model works the best for particles of mass-squared close to mean value for each particles group and smaller momentum values. 
+The efficiency drops for the ''tails'' of the distributions, which is  an important challenge using Bayesian-fitting (in the traditional TOF method) as well. 
+
+Two possible solutions are discussed in the CBM-ML group. The first is dividing training datasets into a few $p$-value bins, e.g., from 0-2 GeV/c, then 2-4GeV/c, etc. 
+It could minimize the mismatch of the identified particles in the ''tails'' of the distribution. 
+The second solution would be using data from more detectors that could allow identifying pions, muons, and electrons separately, as well as other \emph{background} particles, resulting in less mismatch. 
+In this case, however, the \emph{deep learning} network could be needed, as the XGBoost gives the best results when it is used as a binary classifier, and using multiple classes 
+(more than three in this case), could alter the results.\\
+
+To sum up, the application of machine learning algorithms for particle identification in heavy-ion collisions is a very promising solution. 
+It  could be used for the reconstruction of short-lived particles such as K-short, after deploying the model into the CbmRoot. 
+Applying ML for the identification of particles that can be detected directly is also promising, although is not ready for deployment in the CBM experiment software yet. 
+This topic should be further investigated, as due to the amount of data that should be produced in the CBM experiment, the application of ML for particle identification could speed up this task significantly. 
+It should offer physicists, who analyze the results of the experiment, faster access to data of better quality.

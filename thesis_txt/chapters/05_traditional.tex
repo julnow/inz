@@ -1,8 +1,13 @@
 \pagestyle{fancy}
+
+In this chapter, the traditional methods of particles reconstruction and identification (without use of ML) are described.
+
 %%%%%%%%%%%%%%%%% TOF
 \section{Particle identification using the time-of-flight method}\thispagestyle{fancy}
 
-The time-of-flight method (TOF) allows us to differentiate between the groups of particles such as pions, kaons, and protons (positrons). Using the reconstructed:
+
+
+The time-of-flight method (TOF) allows to differentiate between the groups of particles such as pions, kaons, and protons (positrons). Using the reconstructed:
 \begin{itemize}
     \item momentum ($p$) and charge ($q$) (from the \textbf{STS} and \textbf{MVD} detectors) 
     \item time of flight ($t$) and length of the track in the detector ($L$) (from the \textbf{TOF} detector)
@@ -11,9 +16,11 @@ The time-of-flight method (TOF) allows us to differentiate between the groups of
     m^2 = \frac{p^2}{c^2} \cdot \left(\frac{c^2t^2}{L^2} - 1 \right)
     \label{msquared}
 \end{equation}
-where  $c$ - velocity of light. Making a 2D plot, showing $m^2$ on the \emph{y}-axis, and $p\cdot q$ on the \emph{x}-axis, we receive a plot such as in Figure \ref{tof plot}. To further differentiate between the groups of the particles, Gaussian functions can be fitted to the distributions. However, the last step is a non-trivial task, causing the majority of the inaccuracy. While several solutions to this problem exist, such as multidimensional fitting (using more reconstructed variables), the application of ML algorithms will be discussed in this work. 
+where  $c$ - velocity of light in vacuum. Making a 2D plot, showing $m^2$ on the \emph{y}-axis, and $p\cdot q$ on the \emph{x}-axis, we receive a plot such as in Figure \ref{tof plot}. To further differentiate between the groups of the particles, Gaussian functions can be fitted to the distributions of the mass-squared. 
+However, the last step is a non-trivial task, causing the majority of the inaccuracy, especially for particles whose mass-squared is far from the mean $m^2$ value of their group. 
+While several solutions to this problem, such as multidimensional fitting (using more reconstructed variables) exist, the application of ML algorithms will be discussed in this work. 
 
-Other groups of particles such as e.g., muons and electrons, can also be reconstructed using the data from other detectors (respectively MUCH and RICH), but it goes beyond the scope of this thesis.
+Other groups of particles such as e.g., muons and electrons, can also be reconstructed using the data from other detectors ( MUCH and RICH respectively), but it goes beyond the scope of this thesis.
 
 \begin{figure}[H]
     \centering
@@ -26,7 +33,7 @@ Other groups of particles such as e.g., muons and electrons, can also be reconst
 %%%%%%%%%%%%%%%%% KFPF
 \section{Short-lived particles reconstruction}
 
-Short-lived particles like $\Lambda^0$, and \PKshort have a neutral charge, therefore they cannot be detected directly using e.g., the TOF method. However, we can reconstruct these particles by investigating their \emph{daughter particles} - particles coming from their decays. For example, in the main decay mode (66.7\%) a K-short particle decays into a positive and negative pion (Figure \ref{ks decay}). Using i.e. the STS, we can reconstruct the tracks of pions coming from this decay, and thus reconstruct the K-short particle.
+Short-lived particles like $\Lambda^0$, and \PKshort have a neutral charge, therefore they cannot be detected directly using e.g., the TOF method. However, we can reconstruct these particles by investigating their \emph{daughter particles} - particles coming from their decays. For example, in the main decay mode (66.7\%) a K-short particle decays into a positive and negative pion (Figure \ref{ks decay}). Using i.e. the STS, we can reconstruct the tracks of pions (identified earlier using e.g., TOF method) coming from this decay, and thus reconstruct the K-short particle.
 
 \begin{figure}[H]
 \centering
@@ -35,7 +42,7 @@ Short-lived particles like $\Lambda^0$, and \PKshort have a neutral charge, ther
     \label{ks decay}
 \end{figure}
 
-In order to do so, the \textbf{KFParticleFinder} was developed \cite{kfp}. It is an on-line optimized reconstruction package based on Kalman Filter mathematics. It finds pairs of positive and negative pions (in the \PKshort case) which could be a result of the \emph{mother} particle's decay.
+In order to do so, the \textbf{KFParticleFinder} was developed \cite{kfp}. It is an on-line optimized particle reconstruction package based on Kalman Filter mathematics. It finds pairs of positive and negative pions (in the \PKshort case) which could be a result of the \emph{mother} particle's decay.
 %------------------------- PFSimple
 \subsection{PFSimple}
 For offline selection optimization and analysis, \textbf{PFSimple} package was created \cite{lubynets}. Using it, one can optimize selection criteria to differentiate between:

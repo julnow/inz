@@ -1,6 +1,8 @@
 \pagestyle{fancy}
 %%%%%%%%%%%%%%%%% ML
-Machine learning (ML) is a branch of \textbf{artificial intelligence (AI)} and computer science which focuses on the use of data and algorithms to imitate the way that humans learn, gradually improving its accuracy. Through the use of statistical methods, algorithms are trained to make classifications or predictions \cite{ibm}. The term "Machine Learning" was first introduced in a paper from 1959, where the computer was trained to play the game of checkers \cite{ml0}. ML can be divided into three primary categories based on how they learn \cite{ibm}:
+Machine learning (ML) is a branch of \textbf{artificial intelligence (AI)} and computer science which focuses on the use of data and algorithms to imitate the way that humans learn, gradually improving its accuracy. 
+The learning part is called training and is performed on training data, the trained algorithm is then tested on test data. 
+Through the use of statistical methods, algorithms are trained to make classifications or predictions \cite{ibm}. The term "Machine Learning" was first introduced in a paper from 1959, where the computer was trained to play the game of checkers \cite{ml0}. ML can be divided into three primary categories based on how they learn \cite{ibm}:
 \begin{itemize}\thispagestyle{fancy}
     \item \textbf{supervised learning} - using labeled datasets to train algorithms that classify data or predict outcomes accurately. As input data is fed into the model, it adjusts its weights until the model has been fitted appropriately
     \item \textbf{unsupervised learning} - using machine learning algorithms to analyze and cluster unlabeled datasets. These algorithms discover hidden patterns or data groupings without the need for human intervention
@@ -17,7 +19,8 @@ The most known uses of ML are i.e. speech recognition, computer vision, recommen
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% XGBoost
 \section{XGBoost}
-XGBoost  is a \textbf{decision-tree-based, supervised} ML algorithm that uses gradient boosting, available as an open-source package \cite{xgboost}. It is highly efficient when used with e.g., tabular data. \cite{shahid} It combines three elements (also shown on Figure \ref{xgboost diagram}): 
+XGBoost  is a \textbf{decision-tree-based, supervised} ML algorithm that uses gradient boosting, available as an open-source package. 
+It has unique tree structure and it offers parallel processing and regularization parameters. \cite{xgboost}. It is highly efficient when used with e.g., tabular data. \cite{shahid} It combines three elements (also shown on Figure \ref{xgboost diagram}): 
 \begin{itemize}
     \item \textbf{Decision trees} - Graphical representation of possible decisions based on certain conditions
     \item \textbf{Random Forest} - Selecting a random subset of features from multiple decision trees and \emph{bagging} - making a decision based on the majority of their predictions
@@ -28,7 +31,7 @@ XGBoost  is a \textbf{decision-tree-based, supervised} ML algorithm that uses gr
 Contrary to normal decision trees, it returns the \textbf{probability} of a certain decision (not a 0-1 decision) and trains itself given the error of its predictions (using mentioned before \emph{gradient boosting}).
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.9\textwidth]{inz_szablon_new/img/xgboost_diagram.jpeg}
+    \includegraphics[width=.86\textwidth]{inz_szablon_new/img/xgboost_diagram.jpeg}
     \caption{Evolution of XGBoost Algorithm from Decision Trees \cite{xgboost1}}
     \label{xgboost diagram}
 \end{figure}
@@ -41,7 +44,7 @@ Each XGBoost model (and in general almost all ML models) has \textbf{hyperparame
     \item \textbf{n\_estimators} (default = 6) - Number of gradient boosted trees. Equivalent to number of boosting rounds\\
 \end{itemize}
 
-There are multiple ways to choose the optimal configuration (values) of hyperparameters, notably Grid Search, Random Search,  and Bayesian Optimisation \cite{compare hyper}. The comparison between them is shown in  Table \ref{hyperparams}. Following the comparison and the method chosen earlier by the CBM-ML group \cite{shahid}, \textbf{Bayesian Optimisation} will be used in this work.\\
+There are multiple ways to choose the optimal configuration (values) of hyperparameters, notably Grid Search, Random Search,  and Bayesian Optimisation \cite{compare hyper}. The comparison between them is shown in  Table \ref{hyperparams} (the +/- sign means that time needed is shorter than in Grid Search, but longer than in Bayesian Optimisation). Following the comparison and the method chosen earlier by the CBM-ML group \cite{shahid}, \textbf{Bayesian Optimisation} will be used in this work.\\
 
 \begin{table}[h]
 \begin{tabular}{|l|l|l|l|}
