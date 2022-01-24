@@ -1,4 +1,83 @@
 \pagestyle{fancy}
 \thispagestyle{fancy}
 
-Kod identyfikacja TOF ML
+Fragments of code (most important functions) used for TOF identification ML model preparation are presented here (those which do not differ from the K-short recontruction are presented in Appendix A).
+
+\lstset{language=Python}
+\begin{lstlisting}
+
+
+#Enumarate class for particles ID
+class Pid(Enum):
+    ELECTRON = 11
+    PROTON = 2212 
+    MUON = 13
+    PION = 211
+    KAON = 321
+    BCKGR = 999
+    @classmethod
+    def is_known_particle(cls, value):
+        return value in cls._value2member_map_ 
+        
+#Downsampling the data
+def downsample(df:pd.DataFrame, label_col_name:str) -> pd.DataFrame:
+    # find the number of observations in the smallest group
+    nmin = df[label_col_name].value_counts().min()
+    return (df
+            # split the dataframe per group
+            .groupby(label_col_name)
+            # sample nmin observations from each group
+            .apply(lambda x: x.sample(nmin))
+            # recombine the dataframes
+            .reset_index(drop=True)
+            )
+            
+#Sigma region selection
+def sigma(df:pd.DataFrame, pid, nsigma=1, info=False):
+    mean = df[df['pid']==pid]['mass2'].mean()
+    std = df[df['pid']==pid]['mass2'].std()
+    out_sigma = (df['pid']==pid) & ((df['mass2'] < (mean-nsigma*std)) | 
+        (df['mass2'] > (mean+nsigma*std)))
+    df1 = df[~ out_sigma]
+
+    return df1
+
+#Setting probability threshold
+def xgb_preds(df, probaProton, probaKaon, probaPion):
+    #getting max field
+    df['xgb_preds']=df[[0, 1, 2]].idxmax(axis = 1)
+    #setting to bckgr if smaller than probability threshold
+    proton = (df['xgb_preds'] == 0) & (df[0] < probaProton )
+    pion   = (df['xgb_preds'] == 1) & (df[1] < probaKaon )
+    kaon   = (df['xgb_preds'] == 2) & (df[2] < probaPion )
+    df.loc[( proton | pion | kaon ), 'xgb_preds'] = 3
+    return df
+
+#Remapping PIDs for training and 
+from collections import defaultdict
+def remap_names(dataframe):
+    return dataframe.pid.abs().map(defaultdict(lambda: 3, 
+        {Pid.PROTON.value : 0, Pid.KAON.value : 1,  Pid.PION.value : 2, Pid.ELECTRON.value : 2,
+        Pid.MUON.value : 2}),na_action='ignore')#, Pid.ELECTRON.value : 2, , Pid.MUON.value : 2
+ 
+#Tunning hyperparameters
+def bo_tune_xgb(max_depth, gamma, alpha, eta, subsample, n_estimators):
+    params = {'max_depth': int(max_depth),
+              'gamma': gamma,
+              'alpha':alpha,
+              'eta':eta,
+              'subsample': subsample,
+              'n_estimators': n_estimators,
+              # 'eta': 0.3, - it is now same as the learning rate
+              'num_class':np.unique(dtrain.get_label()).shape[0],
+              'objective':'multi:softprob', 
+              'eval_metric': 'mlogloss',
+              # 'tree_method':'hist', 'nthread' : 7}
+    cv_result = xgb.cv(params=params, dtrain=dtrain, num_boost_round=10, 
+        nfold=5)
+    return (1 -  cv_result['test-mlogloss-mean'].iloc[-1])
+    
+
+
+
+\end{lstlisting}

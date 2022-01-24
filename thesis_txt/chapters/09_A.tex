@@ -1,3 +1,154 @@
 \pagestyle{fancy}
 \thispagestyle{fancy}
-Kod rekontrukcja kaonow ML
+Fragments of code (most important functions) used for K-short reconstruction ML model preparation are presented here.
+
+\lstset{language=Python}
+\begin{lstlisting}
+
+#Installing package for importing simulated data in AnalysisTree format 
+#into Pandas Dataframe 
+
+!git clone https://github.com/shahidzk1/CBM_ML_Lambda_Library.git
+%cd CBM_ML_Lambda_Library
+!git pull origin main
+!pip install -r requirements.txt
+!python setup.py install
+from CBM_ML import tree_importer
+
+#Importing simulated data in AnalysisTree data into Pandas Dataframe format 
+sign = tree_importer.tree_importer(signalFileName,'PlainTree',7)
+
+# We only select lambda candidates in the 5 sigma region 
+#around the kaon mass peak
+
+sign = sign[(sign['Candidates_generation']==1) &
+    (sign['Candidates_mass']>lower5SigmaCutSign) &
+    (sign['Candidates_mass']<upper5SigmaCutSign)]
+
+# Similarly for the background, we select background candidates 
+#which are not in the 5 sigma region of the kaon peak
+
+bckgr = tree_importer.tree_importer(allURQMD,'PlainTree',7)
+bckgr = bckgr[(bckgr['Candidates_generation'] < 1)
+    & ((bckgr['Candidates_mass'] > lower5SigmaCutBckgr)
+    & (bckgr['Candidates_mass'] < lower5SigmaCutSign) |
+    (bckgr['Candidates_mass']>upper5SigmaCutSign) 
+    & (bckgr['Candidates_mass'] < upper5SigmaCutBckgr))
+    ].sample(n=4*(sign.shape[0])) 
+    #we select bckgr so that we have 4*more 
+    #entries that for signal (before cleaning)
+
+#Cleaning dataset
+def clean_df(df):
+
+    # Dropping NaNs and Infinities
+    with pd.option_context('mode.use_inf_as_na', True):
+        df = df.dropna()
+        
+    #Experimental constraints
+    is_good_mom = (df['pz'] > pzLowerCut) &
+        (df['p']<pUpperCut) & 
+        (df['pT']<ptUpperCut)
+        
+    is_good_coord = (abs(df['x']) < absXCut) &
+        (abs(df['y']) < absYCut) & (df['z']>lowerZCut) & (df['z']<upperZCut)
+        
+    is_good_params = (df['distance'] > lowerDcaCut) &
+    (df['distance'] < upperDcaCut) &
+        (df['chi2geo']>lowerChi2GeoCut) & 
+        (df['chi2geo'] < upperChi2GeoCut) &
+        (df['chi2topo'] > lowerChi2TopoCut) &
+        (df['chi2topo'] < upperChi2TopoCut) & 
+        (df['eta']>lowerEtaCut) &
+        (df['eta']<upperEtaCut)& (df['l']>lowerLCut) & (df['l']<upperLCut) &
+        (df['loverdl']>lowerLdlCut) &
+        (df['loverdl']<upperLdlCut)
+        
+    is_good_daughters = (df['chi2primfirst']>lowerChi2PrimFirstCut) & 
+        (df['chi2primfirst'] < upperChi2PrimSecondCut) & 
+    (df['chi2primsecond']>lowerChi2PrimSecondCut) &
+        (df['chi2primsecond']<upperChi2PrimFirstCut)
+        
+    is_good_mass = (df['mass']>lowerMassCut) &
+        (df['mass']<upperMassCut)
+        
+    is_good_df = (is_good_mom) & (is_good_coord) &
+        (is_good_params) & (is_good_daughters) & (is_good_mass)
+
+    return df[is_good_df]
+
+#Concatenate background and signal
+df_scaled = pd.concat([signal, background])
+del signal, background
+
+#List of variables used for training
+cuts = [ 'loverdl', 'distance', 'chi2topo', 'chi2primfirst', 
+    'chi2primsecond', 'chi2geo'] 
+
+#Dividing training dataset into Dataframe with variables and
+    'issignal' information
+    
+x = df_scaled[cuts].copy()
+y =pd.DataFrame(df_scaled['issignal'], dtype='int')
+
+#Splitting dataset into training and 
+    validation sets
+x_train, x_test, y_train, y_test =
+    train_test_split(x, y, test_size=0.5, random_state=324)
+del df_scaled, x, y
+
+#DMatrix is a internal data structure that used by XGBoost 
+#which is optimized for both memory efficiency and training speed
+    
+#Splitting data for training and validati into DMatrices
+dtrain = xgb.DMatrix(x_train, label = y_train)
+dtest1=xgb.DMatrix(x_test, label = y_test)
+del x_test
+
+#Bayesian Optimization function for xgboost
+
+def bo_tune_xgb(max_depth, gamma, alpha, n_estimators,learning_rate):
+    params = {'max_depth': int(max_depth),
+              'gamma': gamma,
+              'alpha':alpha,
+              'n_estimators':n_estimators,
+              'learning_rate':learning_rate,
+              'subsample': 0.8,
+              'eta': 0.1,
+              'eval_metric': 'auc', 'nthread' : 8}
+    cv_result = xgb.cv(params, dtrain, num_boost_round=10, nfold=5, 
+        verbose_eval=1)
+    return  cv_result['test-auc-mean'].iloc[-1]
+
+#Invoking the Bayesian Optimizer with the specified parameters to tune
+xgb_bo = BayesianOptimization(bo_tune_xgb, {'max_depth': (6, 16),
+                                             'gamma': (0, 1),
+                                            'alpha': (2,12),
+                                             'learning_rate':(0,.5),
+                                             'n_estimators':(300,1000)
+                                            },
+                             bounds_transformer=bounds_transformer)
+xgb_bo.maximize(n_iter=5, init_points=5)
+
+#Setting hyperparemetres for training
+max_param = max_params['params']
+param= {'alpha': max_param['alpha'], 'gamma': max_param['gamma'], 
+    'learning_rate': max_param['learning_rate'],
+    'max_depth': int(round(max_param['max_depth'],0)),
+    'n_estimators': int(round(max_param['n_estimators'],0)),
+    'objective': 'binary:logistic','nthread' : 8}
+
+
+#Training of the model
+bst = xgb.train(param, dtrain)
+
+#We apply our model on the training data that was trained 
+#on the training data, this helps us to control overfitting
+    
+bst1= bst.predict(dtrain)
+#we store training results in the bst_train Dataframe
+bst_train = pd.DataFrame(data=bst.predict(dtrain),  columns=["xgb_preds"])
+y_train=y_train.set_index(np.arange(0,bst_train.shape[0]))
+bst_train['issignal']=y_train['issignal']
+
+\end{lstlisting}
