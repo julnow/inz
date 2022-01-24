@@ -39,7 +39,6 @@ def sigma(df:pd.DataFrame, pid, nsigma=1, info=False):
     out_sigma = (df['pid']==pid) & ((df['mass2'] < (mean-nsigma*std)) | 
         (df['mass2'] > (mean+nsigma*std)))
     df1 = df[~ out_sigma]
-
     return df1
 
 #Setting probability threshold
@@ -57,8 +56,9 @@ def xgb_preds(df, probaProton, probaKaon, probaPion):
 from collections import defaultdict
 def remap_names(dataframe):
     return dataframe.pid.abs().map(defaultdict(lambda: 3, 
-        {Pid.PROTON.value : 0, Pid.KAON.value : 1,  Pid.PION.value : 2, Pid.ELECTRON.value : 2,
-        Pid.MUON.value : 2}),na_action='ignore')#, Pid.ELECTRON.value : 2, , Pid.MUON.value : 2
+        {Pid.PROTON.value : 0, Pid.KAON.value : 1,  Pid.PION.value : 2, 
+        Pid.ELECTRON.value : 2, Pid.MUON.value : 2}),
+        na_action='ignore')
  
 #Tunning hyperparameters
 def bo_tune_xgb(max_depth, gamma, alpha, eta, subsample, n_estimators):

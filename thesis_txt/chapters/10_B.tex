@@ -85,7 +85,8 @@ void ATreePlainer::InitIndices()
    q_id_vtx_         = in_branch_vtx.GetFieldId("q");
   //Variables in the output file
    auto out_config = AnalysisTree::TaskManager::GetInstance()->GetConfig();
-   const auto& out_branch = out_config->GetBranchConfig(plain_branch_->GetId());
+   const auto& out_branch = out_config->GetBranchConfig(
+    plain_branch_->GetId());
    mass2_id_w1_           = out_branch.GetFieldId("mass2");
    q_id_w1_               = out_branch.GetFieldId("q");
 }
